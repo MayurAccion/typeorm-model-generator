@@ -149,7 +149,7 @@ export default class OracleDriver extends AbstractDriver {
                             break;
                         case "float":
                             tscType = "number";
-                            graphqlType = "String";
+                            graphqlType = "Float";
                             break;
                         case "dec":
                             tscType = "number";
@@ -161,23 +161,23 @@ export default class OracleDriver extends AbstractDriver {
                             break;
                         case "integer":
                             tscType = "number";
-                            graphqlType = "String";
+                            graphqlType = "Int";
                             break;
                         case "int":
                             tscType = "number";
-                            graphqlType = "String";
+                            graphqlType = "Int";
                             break;
                         case "smallint":
                             tscType = "number";
-                            graphqlType = "String";
+                            graphqlType = "Int";
                             break;
                         case "real":
                             tscType = "number";
-                            graphqlType = "String";
+                            graphqlType = "Float";
                             break;
                         case "double precision":
                             tscType = "number";
-                            graphqlType = "String";
+                            graphqlType = "Float";
                             break;
                         case "date":
                             tscType = "Date";
