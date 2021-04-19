@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies, import/no-unresolved
 import type * as Oracle from "oracledb";
+import * as _ from "lodash";
 import * as TypeormDriver from "typeorm/driver/oracle/OracleDriver";
 import { DataTypeDefaults } from "typeorm/driver/types/DataTypeDefaults";
 import * as TomgUtils from "../Utils";
@@ -81,12 +82,22 @@ export default class OracleDriver extends AbstractDriver {
                 DATA_PRECISION: number;
                 DATA_SCALE: number;
                 IDENTITY_COLUMN: string; // doesn't exist in old oracle versions (#195)
-                IS_UNIQUE: number;
-            }>(`SELECT utc.*, (select count(*) from USER_CONS_COLUMNS ucc
-             JOIN USER_CONSTRAINTS uc ON  uc.CONSTRAINT_NAME = ucc.CONSTRAINT_NAME and uc.CONSTRAINT_TYPE='U'
-            where ucc.column_name = utc.COLUMN_NAME AND ucc.table_name = utc.TABLE_NAME) IS_UNIQUE
-           FROM USER_TAB_COLUMNS utc`)
+            }>(`SELECT * FROM USER_TAB_COLUMNS`)
         ).rows!;
+
+        const uniqueConstraintResponse = (
+            await this.Connection.execute<{
+                TABLE_NAME: string;
+                COLUMN_NAME: string;
+            }>(`SELECT ucc.TABLE_NAME, ucc.COLUMN_NAME from USER_CONS_COLUMNS ucc
+            JOIN USER_CONSTRAINTS uc ON  uc.CONSTRAINT_NAME = ucc.CONSTRAINT_NAME and uc.CONSTRAINT_TYPE='U'`)
+        ).rows!;
+        const uniqueConstraintColumns: {
+            [key: string]: {
+                TABLE_NAME: string;
+                COLUMN_NAME: string;
+            }[];
+        } = _.groupBy(uniqueConstraintResponse, "TABLE_NAME");
 
         entities.forEach((ent) => {
             response
@@ -97,7 +108,13 @@ export default class OracleDriver extends AbstractDriver {
                         name: resp.COLUMN_NAME,
                     };
                     if (resp.NULLABLE === "Y") options.nullable = true;
-                    if (resp.IS_UNIQUE > 0) options.unique = true;
+                    // if (resp.IS_UNIQUE > 0) options.unique = true;
+                    if (uniqueConstraintColumns[ent.tscName]) {
+                        uniqueConstraintColumns[ent.tscName].forEach((col) => {
+                            if (col.COLUMN_NAME === tscName)
+                                options.unique = true;
+                        });
+                    }
                     const generated =
                         resp.IDENTITY_COLUMN === "YES" ? true : undefined;
                     const defaultValue =
