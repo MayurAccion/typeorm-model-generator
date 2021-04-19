@@ -109,96 +109,127 @@ export default class OracleDriver extends AbstractDriver {
                     const DATA_TYPE = resp.DATA_TYPE.replace(/\([0-9]+\)/g, "");
                     const columnType = DATA_TYPE.toLowerCase();
                     let tscType = "";
+                    let graphqlType: Column["graphqlType"];
                     switch (DATA_TYPE.toLowerCase()) {
                         case "char":
                             tscType = "string";
+                            graphqlType = "String";
                             break;
                         case "nchar":
                             tscType = "string";
+                            graphqlType = "String";
                             break;
                         case "nvarchar2":
                             tscType = "string";
+                            graphqlType = "String";
                             break;
                         case "varchar2":
                             tscType = "string";
+                            graphqlType = "String";
                             break;
                         case "long":
                             tscType = "string";
+                            graphqlType = "String";
                             break;
                         case "raw":
                             tscType = "Buffer";
+                            graphqlType = "String";
                             break;
                         case "long raw":
                             tscType = "Buffer";
+                            graphqlType = "String";
                             break;
                         case "number":
                             tscType = "number";
+                            graphqlType = "String";
                             break;
                         case "numeric":
                             tscType = "number";
+                            graphqlType = "String";
                             break;
                         case "float":
                             tscType = "number";
+                            graphqlType = "String";
                             break;
                         case "dec":
                             tscType = "number";
+                            graphqlType = "String";
                             break;
                         case "decimal":
                             tscType = "number";
+                            graphqlType = "String";
                             break;
                         case "integer":
                             tscType = "number";
+                            graphqlType = "String";
                             break;
                         case "int":
                             tscType = "number";
+                            graphqlType = "String";
                             break;
                         case "smallint":
                             tscType = "number";
+                            graphqlType = "String";
                             break;
                         case "real":
                             tscType = "number";
+                            graphqlType = "String";
                             break;
                         case "double precision":
                             tscType = "number";
+                            graphqlType = "String";
                             break;
                         case "date":
                             tscType = "Date";
+                            graphqlType = "String";
                             break;
                         case "timestamp":
                             tscType = "Date";
+                            graphqlType = "String";
                             break;
                         case "timestamp with time zone":
                             tscType = "Date";
+                            graphqlType = "String";
                             break;
                         case "timestamp with local time zone":
                             tscType = "Date";
+                            graphqlType = "String";
                             break;
                         case "interval year to month":
                             tscType = "string";
+                            graphqlType = "String";
                             break;
                         case "interval day to second":
                             tscType = "string";
+                            graphqlType = "String";
                             break;
                         case "bfile":
                             tscType = "Buffer";
+                            graphqlType = "String";
                             break;
                         case "blob":
                             tscType = "Buffer";
+                            graphqlType = "String";
                             break;
                         case "clob":
                             tscType = "string";
+                            graphqlType = "String";
                             break;
                         case "nclob":
                             tscType = "string";
+                            graphqlType = "String";
                             break;
                         case "rowid":
                             tscType = "number";
+                            graphqlType = "String";
                             break;
                         case "urowid":
                             tscType = "number";
+                            graphqlType = "String";
                             break;
                         default:
                             tscType = "NonNullable<unknown>";
+                            graphqlType = "String";
                             TomgUtils.LogError(
                                 `Unknown column type:${DATA_TYPE}`
                             );
@@ -222,7 +253,7 @@ export default class OracleDriver extends AbstractDriver {
                         options.length =
                             resp.DATA_LENGTH > 0 ? resp.DATA_LENGTH : undefined;
                     }
-
+                    graphqlType = generated ? "ID" : graphqlType;
                     ent.columns.push({
                         generated,
                         type: columnType,
@@ -230,6 +261,7 @@ export default class OracleDriver extends AbstractDriver {
                         options,
                         tscName,
                         tscType,
+                        graphqlType,
                     });
                 });
         });

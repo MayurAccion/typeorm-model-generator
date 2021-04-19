@@ -241,6 +241,9 @@ function addImportsAndGenerationOptions(
         if (generationOptions.generateConstructor) {
             entity.generateConstructor = true;
         }
+        if (generationOptions.graphql) {
+            entity.graphql = true;
+        }
     });
     return dbModel;
 }

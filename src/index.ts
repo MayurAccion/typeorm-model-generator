@@ -297,6 +297,12 @@ function checkYargsParameters(options: options): options {
             default: options.generationOptions.exportType === "default",
             describe: "Generate index file",
         },
+        gql: {
+            alias: "graphql",
+            boolean: true,
+            default: options.generationOptions.graphql,
+            describe: "Generate graphql annotations",
+        },
     });
 
     options.connectionOptions.databaseNames = argv.d.split(",");

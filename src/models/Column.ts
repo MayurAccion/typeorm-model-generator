@@ -23,4 +23,7 @@ export type Column = {
         array?: boolean; // ?
         comment?: string;
     };
+    // The GraphQL schema language supports the scalar types of
+    // String, Int, Float, Boolean, and ID, so you can use these directly in the schema you pass to buildSchema.
+    graphqlType?: "String" | "Int" | "Float" | "Boolean" | "ID" | "JSON";
 };

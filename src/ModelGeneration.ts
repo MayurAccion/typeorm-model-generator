@@ -79,6 +79,10 @@ function generateModels(
             entitiesPath,
             `${casedFileName}.ts`
         );
+        if (generationOptions.graphql) {
+            element.graphql = true;
+        }
+
         const rendered = entityCompliedTemplate(element);
         const withImportStatements = removeUnusedImports(
             EOL !== eolConverter[generationOptions.convertEol]
@@ -259,6 +263,19 @@ function createHandlebarsHelpers(generationOptions: IGenerationOptions): void {
         ne: (v1, v2) => v1 !== v2,
         or: (v1, v2) => v1 || v2,
     });
+    Handlebars.registerHelper(
+        "toGraphqlRelation",
+        (entityType: string, relationType: Relation["relationType"]) => {
+            let retVal = entityType;
+            if (relationType === "ManyToMany" || relationType === "OneToMany") {
+                retVal = `[${retVal}]`;
+            }
+            if (generationOptions.lazy) {
+                retVal = `Promise<${retVal}>`;
+            }
+            return retVal;
+        }
+    );
 }
 
 function createTsConfigFile(tsconfigPath: string): void {
