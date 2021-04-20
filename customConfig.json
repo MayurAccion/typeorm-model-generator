@@ -1,9 +1,0 @@
-{
-  "EVENT_DIGITALRECORDINGTYPE": {
-      "primary": ["EVENT_RECORDINGTYPE_ID"],
-      "test":23
-  },
-  "SECTIONEXPERTS": {
-      "primary": ["EXPERTID","SECTIONID"]
-  }
-}
