@@ -29,7 +29,7 @@ export default interface IGenerationOptions {
 
 export type CustomConfig = {
     [key: string]: {
-        primary: string;
+        primary: string[];
     };
 };
 

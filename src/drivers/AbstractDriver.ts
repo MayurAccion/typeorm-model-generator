@@ -425,10 +425,10 @@ export default abstract class AbstractDriver {
             ) {
                 if (customConfig[entity.tscName]) {
                     entity.columns
-                        .filter(
-                            (col) =>
-                                col.tscName ===
-                                customConfig[entity.tscName].primary
+                        .filter((col) =>
+                            customConfig[entity.tscName].primary.includes(
+                                col.tscName
+                            )
                         )
                         .forEach((col) => {
                             // eslint-disable-next-line no-param-reassign
