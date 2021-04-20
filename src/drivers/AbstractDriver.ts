@@ -10,7 +10,7 @@ import IConnectionOptions from "../IConnectionOptions";
 import { Entity } from "../models/Entity";
 import { RelationInternal } from "../models/RelationInternal";
 import { Relation } from "../models/Relation";
-import IGenerationOptions from "../IGenerationOptions";
+import IGenerationOptions, { CustomConfig } from "../IGenerationOptions";
 import { Column } from "../models/Column";
 
 export default abstract class AbstractDriver {
@@ -185,7 +185,10 @@ export default abstract class AbstractDriver {
             connectionOptions.schemaNames,
             connectionOptions.databaseNames
         );
-        AbstractDriver.FindPrimaryColumnsFromIndexes(dbModel);
+        AbstractDriver.FindPrimaryColumnsFromIndexes(
+            dbModel,
+            generationOptions.customConfig
+        );
         dbModel = await this.GetRelations(
             dbModel,
             connectionOptions.schemaNames,
@@ -394,7 +397,10 @@ export default abstract class AbstractDriver {
         generationOptions: IGenerationOptions
     ): Promise<Entity[]>;
 
-    public static FindPrimaryColumnsFromIndexes(dbModel: Entity[]) {
+    public static FindPrimaryColumnsFromIndexes(
+        dbModel: Entity[],
+        customConfig: CustomConfig
+    ) {
         dbModel.forEach((entity) => {
             const primaryIndex = entity.indices.find((v) => v.primary);
             entity.columns
@@ -417,7 +423,26 @@ export default abstract class AbstractDriver {
                     return !!v.primary;
                 })
             ) {
-                TomgUtils.LogError(`Table ${entity.tscName} has no PK.`, false);
+                if (customConfig[entity.tscName]) {
+                    entity.columns
+                        .filter(
+                            (col) =>
+                                col.tscName ===
+                                customConfig[entity.tscName].primary
+                        )
+                        .forEach((col) => {
+                            // eslint-disable-next-line no-param-reassign
+                            col.primary = true;
+                            if (col.options.unique) {
+                                delete col.options.unique;
+                            }
+                        });
+                } else {
+                    TomgUtils.LogError(
+                        `Table ${entity.tscName} has no PK.`,
+                        false
+                    );
+                }
             }
         });
     }

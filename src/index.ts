@@ -5,6 +5,7 @@ import IConnectionOptions, {
     getDefaultConnectionOptions,
 } from "./IConnectionOptions";
 import IGenerationOptions, {
+    CustomConfig,
     getDefaultGenerationOptions,
 } from "./IGenerationOptions";
 import fs = require("fs-extra");
@@ -747,6 +748,34 @@ async function useInquirer(options: options): Promise<options> {
             options.generationOptions.convertEol = eolChoice.eol;
         }
     }
+    const { isCustomConfig } = await inquirer.prompt([
+        {
+            choices: ["Yes", "No"],
+            default: "No",
+            message: "Do you want to add custom config for entities?",
+            name: "isCustomConfig",
+            type: "list",
+        },
+    ]);
+    if (isCustomConfig === "Yes") {
+        const { customConfigPath } = await inquirer.prompt([
+            {
+                default: path.resolve(process.cwd(), "customConfig.json"),
+                message: "Path to Custom Config file:",
+                name: "customConfigPath",
+                type: "input",
+            },
+        ]);
+        if (fs.existsSync(path.resolve(customConfigPath))) {
+            const customConfig: CustomConfig = fs.readJSONSync(
+                path.resolve(customConfigPath)
+            );
+            options.generationOptions.customConfig = customConfig;
+        } else {
+            console.warn(`Warning: ${customConfigPath} file not found!`);
+        }
+    }
+
     const { saveConfig } = await inquirer.prompt([
         {
             choices: [

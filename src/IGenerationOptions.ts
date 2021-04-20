@@ -24,7 +24,14 @@ export default interface IGenerationOptions {
     indexFile: boolean;
     exportType: "named" | "default";
     graphql: boolean;
+    customConfig: CustomConfig;
 }
+
+export type CustomConfig = {
+    [key: string]: {
+        primary: string;
+    };
+};
 
 export const eolConverter = {
     LF: "\n",
@@ -51,6 +58,7 @@ export function getDefaultGenerationOptions(): IGenerationOptions {
         indexFile: false,
         exportType: "named",
         graphql: true,
+        customConfig: {},
     };
     return generationOptions;
 }
